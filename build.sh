@@ -21,7 +21,7 @@ pushFunction () {
     echo
     echo ================================================================================
     docker push \
-        -t $BUILD_PREFIX$1:$BUILD_VERSION_ARG \
+        $BUILD_PREFIX$1:$BUILD_VERSION_ARG \
     echo
 }
 
