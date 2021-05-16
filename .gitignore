@@ -142,3 +142,4 @@ cython_debug/
 .conda/
 .config/
 .local/
+.DS_Store/

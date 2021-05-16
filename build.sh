@@ -49,5 +49,5 @@ done
 for DIR_CONFIG in $(ls -d */ | cut -f1 -d'/')
 do
     buildFunction $DIR_CONFIG
-    # pushFunction $DIR_CONFIG
+    pushFunction $DIR_CONFIG
 done
