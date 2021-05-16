@@ -1,7 +1,7 @@
 clear
 docker system prun
 BUILD_VERSION_ARG=$1
-BUILD_PREFIX="tuttlebr/kubeflow-servers/"
+BUILD_PREFIX="tuttlebr/kubeflow-servers"
 
 clearSession(){
     clear
@@ -9,30 +9,30 @@ clearSession(){
 }
 
 removeImage(){
-    echo Removing image $BUILD_PREFIX$1:$BUILD_VERSION_ARG 
-    docker rmi -f $BUILD_PREFIX$1:$BUILD_VERSION_ARG 
+    echo Removing image $BUILD_PREFIX:$1-$BUILD_VERSION_ARG 
+    docker rmi -f $BUILD_PREFIX:$1-$BUILD_VERSION_ARG 
 }
 
 
 pushFunction () {
     echo ================================================================================
     echo
-    echo pushing $BUILD_PREFIX$1:$BUILD_VERSION_ARG
+    echo pushing $BUILD_PREFIX:$1-$BUILD_VERSION_ARG
     echo
     echo ================================================================================
     docker push \
-        $BUILD_PREFIX$1:$BUILD_VERSION_ARG
+        $BUILD_PREFIX:$1-$BUILD_VERSION_ARG
     echo
 }
 
 buildFunction () {
     echo ================================================================================
     echo
-    echo building $BUILD_PREFIX$1:$BUILD_VERSION_ARG
+    echo building $BUILD_PREFIX:$1-$BUILD_VERSION_ARG
     echo
     echo ================================================================================
     docker build \
-        -t $BUILD_PREFIX$1:$BUILD_VERSION_ARG \
+        -t $BUILD_PREFIX:$1-$BUILD_VERSION_ARG \
         --build-arg BUILD_VERSION_ARG=$BUILD_VERSION_ARG \
         $1 
     echo

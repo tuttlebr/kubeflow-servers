@@ -1,5 +1,5 @@
 ARG BUILD_VERSION_ARG
-FROM tuttlebr/kubeflow-servers/jupyter:$BUILD_VERSION_ARG
+FROM tuttlebr/kubeflow-servers:jupyter-$BUILD_VERSION_ARG
 
 # install - requirements.txt
 COPY --chown=jovyan:users requirements.txt /tmp/requirements.txt

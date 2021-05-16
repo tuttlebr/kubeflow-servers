@@ -1,5 +1,5 @@
 ARG BUILD_VERSION_ARG
-FROM tuttlebr/kubeflow-servers/base:$BUILD_VERSION_ARG
+FROM tuttlebr/kubeflow-servers:base-$BUILD_VERSION_ARG
 
 USER root
 
