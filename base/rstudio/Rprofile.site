@@ -1,0 +1,11 @@
+local({r <- getOption("repos")
+      r["CRAN"] <- "https://artifacts.us.dominos.com/artifactory/mran-all"
+      r["REVO"] <- "https://artifacts.us.dominos.com/artifactory/mran-revolutionanalytics"
+      options(repos=r, download.file.method = 'libcurl')
+
+      switch(Sys.info()[["sysname"]],
+        Linux=options(Ncpus=as.numeric(system("cat /proc/cpuinfo | grep -c processor", intern=TRUE)))
+    )
+      })
+options(repos = c(CRAN = "https://artifacts.us.dominos.com/artifactory/mran-all"), download.file.method = 'libcurl')
+options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))

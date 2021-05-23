@@ -1,70 +1,37 @@
-FROM nvcr.io/nvidia/cuda:11.0-base-ubuntu20.04
 
-# common environemnt variables
-ENV NB_USER jovyan
-ENV NB_UID 1000
-ENV NB_PREFIX /
-ENV HOME /home/$NB_USER
-ENV SHELL /bin/bash
+# Candidates
+# nvcr.io/nvidia/tensorflow:20.09-tf2-py3
+# nvcr.io/nvidia/pytorch:20.09-py3
+# rapidsai/rapidsai:cuda11.0-runtime-ubuntu20.04-py3.8
 
-# args - software versions
-ARG ARCH="amd64"
-ARG S6_VERSION="v2.2.0.3"
-ARG KUBECTL_VERSION="v1.20.5"
+ARG BASE_IMAGE_ARG
+FROM ${BASE_IMAGE_ARG}
 
-# install - usefull linux packages
-RUN export DEBIAN_FRONTEND=noninteractive \
-   && apt-get -yq update \
-   && apt-get -yq install --no-install-recommends \
-   apt-transport-https \
-   bash \
-   bzip2 \
-   ca-certificates \
-   curl \
-   git \
-   gnupg \
-   gnupg2 \
-   locales \
-   lsb-release \
-   nano \
-   software-properties-common \
-   tzdata \
-   unzip \
-   vim \
-   wget \
-   zip \
-   && apt-get clean \
-   && rm -rf /var/lib/apt/lists/*
+ARG NB_PREFIX=/
+ARG NB_TYPE=lab
+ENV HOME=/home/jovyan
+ENV DEBIAN_FRONTEND noninteractive
 
-# install - s6 overlay
-RUN export GNUPGHOME=/tmp/ \
-   && curl -sL "https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-${ARCH}-installer" -o /tmp/s6-overlay-${ARCH}-installer \
-   && curl -sL "https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-${ARCH}-installer.sig" -o /tmp/s6-overlay-${ARCH}-installer.sig \
-   && curl -sL "https://keybase.io/justcontainers/key.asc" | gpg -q --import \
-   && gpg -q --verify /tmp/s6-overlay-${ARCH}-installer.sig /tmp/s6-overlay-${ARCH}-installer \
-   && chmod +x /tmp/s6-overlay-${ARCH}-installer \
-   && /tmp/s6-overlay-${ARCH}-installer / \
-   && rm /tmp/s6-overlay-${ARCH}-installer.sig /tmp/s6-overlay-${ARCH}-installer
+WORKDIR ${HOME}
 
-# install - kubectl
-RUN curl -sL "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" -o /usr/local/bin/kubectl \
-   && curl -sL "https://dl.k8s.io/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl.sha256" -o /tmp/kubectl.sha256 \
-   && echo "$(cat /tmp/kubectl.sha256) /usr/local/bin/kubectl" | sha256sum --check \
-   && rm /tmp/kubectl.sha256 \
-   && chmod +x /usr/local/bin/kubectl
+COPY clean-layer.sh /usr/bin/clean-layer.sh
+COPY bashrc /etc/bash.bashrc
+COPY requirements.txt .
 
-# create user and set required ownership
-RUN useradd -M -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
-   && mkdir -p ${HOME} \
-   && chown -R ${NB_USER}:users ${HOME} \
-   && chown -R ${NB_USER}:users /usr/local/bin \
-   && chown -R ${NB_USER}:users /etc/s6
+RUN chmod a+rwx /usr/bin/clean-layer.sh
+RUN chmod a+rwx /etc/bash.bashrc
 
-# set locale configs
-RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
-   && locale-gen
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+# runtime support
+RUN apt-get -yq update \
+    && apt-get install -y --no-install-recommends \
+    g++ \
+    gcc \
+    build-essential \
+    nano \
+    && clean-layer.sh
 
-USER $NB_UID
+RUN python -m pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir --upgrade pystan \
+    && pip install --no-cache-dir -r requirements.txt
+
+CMD ["sh","-c", "jupyter lab --notebook-dir=/home/jovyan --ip=0.0.0.0 --no-browser --allow-root --port=8888 --NotebookApp.token='' --NotebookApp.password='' --NotebookApp.allow_origin='*' --NotebookApp.base_url=${NB_PREFIX}"]

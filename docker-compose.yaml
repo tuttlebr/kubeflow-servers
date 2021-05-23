@@ -1,0 +1,101 @@
+version: "3.9"
+services:
+  base-ide:
+    image: tuttlebr/kubeflow-servers:ide-${DEEPOPS_BUILD_VERSION}
+    build:
+      context: ./base
+      dockerfile: ./Dockerfile.ide
+      args:
+        - BASE_IMAGE_ARG=nvcr.io/nvidia/cuda:${CUDA_COMPAT}-${CUDNN_COMPAT}-${BUILD_TYPE}-${BASE_OS}
+      labels:
+        - "com.example.cuda=${CUDA_COMPAT}"
+        - "com.example.cudnn=${CUDNN_COMPAT}"
+
+  rstudio:
+    image: tuttlebr/kubeflow-servers:rstudio-${DEEPOPS_BUILD_VERSION}
+    volumes:
+      - type: bind
+        source: ${TEST_TMP_DIR}
+        target: /home/jovyan
+    ports:
+      - "8881:8888"
+    depends_on:
+      - base-ide
+    build:
+      context: ./base/rstudio
+      dockerfile: ./Dockerfile
+      args:
+        - BASE_IMAGE_ARG=tuttlebr/kubeflow-servers:ide-${DEEPOPS_BUILD_VERSION}
+      labels:
+        - "com.example.cuda=${CUDA_COMPAT}"
+        - "com.example.cudnn=${CUDNN_COMPAT}"
+
+  vscode:
+    image: tuttlebr/kubeflow-servers:vscode-${DEEPOPS_BUILD_VERSION}
+    volumes:
+      - type: bind
+        source: ${TEST_TMP_DIR}
+        target: /home/jovyan
+    ports:
+      - "8882:8888"
+    depends_on:
+      - base-ide
+    build:
+      context: ./base/vscode
+      dockerfile: ./Dockerfile
+      args:
+        - BASE_IMAGE_ARG=tuttlebr/kubeflow-servers:ide-${DEEPOPS_BUILD_VERSION}
+      labels:
+        - "com.example.cuda=${CUDA_COMPAT}"
+        - "com.example.cudnn=${CUDNN_COMPAT}"
+
+  tensorflow:
+    image: tuttlebr/kubeflow-servers:tensorflow-${DEEPOPS_BUILD_VERSION}
+    volumes:
+      - type: bind
+        source: ${TEST_TMP_DIR}
+        target: /home/jovyan
+    ports:
+      - "8883:8888"
+    build:
+      context: ./base
+      dockerfile: ./Dockerfile
+      args:
+        - BASE_IMAGE_ARG=nvcr.io/nvidia/tensorflow:${TENSORFLOW_VERSION}
+      labels:
+        - "com.example.cuda=${CUDA_COMPAT}"
+        - "com.example.cudnn=${CUDNN_COMPAT}"
+
+  pytorch:
+    image: tuttlebr/kubeflow-servers:pytorch-${DEEPOPS_BUILD_VERSION}
+    volumes:
+      - type: bind
+        source: ${TEST_TMP_DIR}
+        target: /home/jovyan
+    ports:
+      - "8884:8888"
+    build:
+      context: ./base
+      dockerfile: ./Dockerfile
+      args:
+        - BASE_IMAGE_ARG=nvcr.io/nvidia/pytorch:${PYTORCH_VERSION}
+      labels:
+        - "com.example.cuda=${CUDA_COMPAT}"
+        - "com.example.cudnn=${CUDNN_COMPAT}"
+
+  rapids:
+    image: tuttlebr/kubeflow-servers:rapids-${DEEPOPS_BUILD_VERSION}
+    volumes:
+      - type: bind
+        source: ${TEST_TMP_DIR}
+        target: /home/jovyan
+    ports:
+      - "8885:8888"
+    build:
+      context: ./base
+      dockerfile: ./Dockerfile
+      args:
+        - BASE_IMAGE_ARG=nvcr.io/nvidia/rapidsai/rapidsai:${RAPIDS_VERSION}
+      labels:
+        - "com.example.cuda=${CUDA_COMPAT}"
+        - "com.example.cudnn=${CUDNN_COMPAT}"
