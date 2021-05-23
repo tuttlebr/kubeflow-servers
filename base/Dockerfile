@@ -24,10 +24,19 @@ RUN chmod a+rwx /etc/bash.bashrc
 # runtime support
 RUN apt-get -yq update \
     && apt-get install -y --no-install-recommends \
+    curl \
     g++ \
     gcc \
     build-essential \
     nano \
+    && clean-layer.sh
+
+# node.js
+RUN curl -sL "https://deb.nodesource.com/gpgkey/nodesource.gpg.key" | apt-key add - \
+    && echo "deb https://deb.nodesource.com/node_14.x focal main" > /etc/apt/sources.list.d/nodesource.list \
+    && apt-get -yq update \
+    && apt-get -yq install --no-install-recommends \
+    nodejs \
     && clean-layer.sh
 
 RUN python -m pip install --no-cache-dir --upgrade pip \

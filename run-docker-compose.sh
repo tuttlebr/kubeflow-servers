@@ -1,18 +1,18 @@
-
+clear
 cat << EOF
  _________________________________________
-/ pruning docker images by removing...    \
+| pruning docker images by removing...    |
 |  - all stopped containers               |
 |  - all networks not used by at least    |
 |    one container                        |
 |  - all dangling images                  |
 |  - all build cache                      |
-\                                         /
- -----------------------------------------
-    \
-     \
-      \
-                       ##         .
+|                                         |
+ .                                        .
+      .                             .
+            .                .
+                  . .    
+                        ##         .
                  ## ## ##        ==
               ## ## ## ## ##    ===
           /""""""""""""""""""\___/ ===

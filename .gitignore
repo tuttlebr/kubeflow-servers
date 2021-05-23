@@ -143,3 +143,4 @@ cython_debug/
 .config/
 .local/
 .DS_Store/
+.test-tmp-dir/

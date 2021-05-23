@@ -136,8 +136,6 @@ RUN export PANDOC_TEMPLATES_VERSION=`pandoc -v | grep -oP "(?<=pandoc\s)[0-9\.]+
 
 COPY rstudio-proxy.conf /etc/apache2/sites-enabled/rstudio-proxy.conf
 
-COPY Rprofile.site ${R_HOME}/etc/Rprofile.site
-
 RUN echo 'Listen 8888' > /etc/apache2/ports.conf
 
 COPY root/ /
